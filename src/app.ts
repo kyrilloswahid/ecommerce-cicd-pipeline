@@ -1,9 +1,10 @@
-import express from 'express';
 import cors from 'cors';
+import express from 'express';
 import helmet from 'helmet';
+
+import cartRouter from './routes/cart';
 import healthRouter from './routes/health';
 import productsRouter from './routes/products';
-import cartRouter from './routes/cart';
 
 const app = express();
 
