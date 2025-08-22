@@ -26,4 +26,4 @@ jobs:
         run: npm audit --audit-level=moderate
 
       - name: Run Unit Tests
-        run: npm tests
+        run: npm test
