@@ -21,6 +21,7 @@ body {
 
 .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px 56px; }
 
+/* Header */
 .header {
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; padding: 14px 18px; border-radius: 16px;
@@ -35,9 +36,7 @@ body {
   display: grid; place-items: center; color: #061018; font-weight: 900;
 }
 .brand h1 { font-size: 18px; margin: 0; letter-spacing: .2px; }
-.header .health {
-  font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px;
-}
+.header .health { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
 .pill { padding: 6px 10px; border-radius: 999px; background: #0e1620; border: 1px solid rgba(255,255,255,.06); }
 .ok { color: #7dff95; }
 .bad { color: #ff7d7d; }
@@ -64,6 +63,7 @@ body {
   background: var(--accent); color: #061018; font-weight: 800;
 }
 
+/* Hero */
 .hero {
   margin: 24px 0 14px;
   padding: 24px;
@@ -71,9 +71,9 @@ body {
   background: linear-gradient(135deg, rgba(106,167,255,.14), rgba(108,255,196,.10));
   border: 1px solid rgba(255,255,255,.06);
 }
-
 .muted { color: var(--muted); }
 
+/* Product grid & cards */
 .grid {
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -85,12 +85,21 @@ body {
   display: flex; flex-direction: column;
 }
 .card .thumb {
-  aspect-ratio: 16 / 10; width: 100%; object-fit: cover;
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  background: #0d1520;
+  border-bottom: 1px solid rgba(255,255,255,.06);
 }
-.card .body { padding: 14px; display: grid; gap: 10px; }
+.card .body {
+  flex: 1;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
 .title { font-weight: 700; letter-spacing: .2px; }
 .price { color: #cfe3ff; font-weight: 600; }
-.actions { display: flex; gap: 8px; }
+.actions { display: flex; gap: 8px; margin-top: auto; }
 .actions .add {
   flex: 1;
   background: linear-gradient(180deg, var(--accent), #5d9bff);
@@ -103,6 +112,7 @@ body {
   background: #0d1520; color: var(--text); border: 1px solid rgba(255,255,255,.08);
 }
 
+/* Panels */
 .panel {
   margin-top: 24px; padding: 16px; border-radius: 16px;
   background: linear-gradient(180deg, #0d1520, #0b121b);
@@ -111,6 +121,23 @@ body {
 .panel h3 { margin: 0 0 8px; }
 pre { margin: 0; background: #0b121b; border-radius: 10px; padding: 10px; overflow: auto; color: #b9d0ea; }
 
+/* Cart UI */
+.cart-wrap { display: grid; gap: 12px; }
+.cart-table { width: 100%; border-collapse: collapse; background: #0b121b; border-radius: 12px; overflow: hidden; }
+.cart-table { table-layout: fixed; }
+.col-qty { width: 90px; }
+.col-price { width: 140px; }
+.col-subtotal { width: 160px; }
+.cart-table th, .cart-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.06); }
+.cart-table thead th { background: #0e1824; color: #cfe3ff; }
+.cart-table thead th:first-child { text-align: left; }
+.cart-table thead th.right { text-align: right; }
+.right { text-align: right; }
+.cart-footer { display: grid; gap: 8px; align-items: center; grid-template-columns: 1fr auto; }
+.cart-total { display: flex; gap: 8px; align-items: baseline; }
+.cart-actions { display: flex; gap: 10px; justify-self: end; }
+
+/* Toast */
 .toast {
   position: fixed; right: 16px; bottom: 16px;
   background: #0e1824; border: 1px solid rgba(255,255,255,.1);

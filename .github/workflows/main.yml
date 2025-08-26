@@ -28,3 +28,13 @@ jobs:
       - name: Run Unit Tests
         run: npm test
 
+   docker:
+     needs: build
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/checkout@v4
+
+       - name: Build Docker Image
+         run: docker build . -t my-app:latest
+       - name: Run Docker Container
+         run: docker run my-app:latest

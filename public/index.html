@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Shop</title>
+    <title>Kyrillos's E-Shop</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/style.css" />
   </head>
@@ -12,7 +12,7 @@
         <div class="brand">
           <div class="logo" aria-hidden="true">S</div>
           <div>
-            <h1>Shop</h1>
+            <h1>Kyrillos's E-Shop</h1>
             <div class="health">
               <span id="health-pill" class="pill">Checking health…</span>
             </div>
@@ -31,7 +31,7 @@
 
       <section class="hero">
         <h2>Featured Gear</h2>
-        <p class="muted">Browse a few hand‑picked items. Add to cart to see the in‑memory cart update instantly.</p>
+        <p class="muted">Browse a few hand-picked items. Add to cart to see the cart update instantly.</p>
       </section>
 
       <section aria-labelledby="products-heading">
@@ -40,9 +40,43 @@
       </section>
 
       <section class="panel" aria-labelledby="cart-heading">
-        <h3 id="cart-heading">Cart (debug view)</h3>
-        <pre id="cart-json">{}</pre>
-      </section>
+  <h3 id="cart-heading">Cart</h3>
+
+  <div class="cart-wrap">
+    <table class="cart-table">
+      <colgroup>
+        <col class="col-item">
+        <col class="col-qty">
+        <col class="col-price">
+        <col class="col-subtotal">
+      </colgroup>
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="right">Qty</th>
+          <th class="right">Price</th>
+          <th class="right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="cartRows"></tbody>
+    </table>
+
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total items:</span>
+        <strong id="totalItems">0</strong>
+      </div>
+      <div class="cart-total">
+        <span>Total amount:</span>
+        <strong id="totalAmount">$0.00</strong>
+      </div>
+      <div class="cart-actions">
+        <button id="checkoutBtn" class="button">Checkout</button>
+      </div>
+    </div>
+  </div>
+</section>
+
     </div>
 
     <div class="toast" aria-live="polite"></div>

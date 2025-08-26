@@ -31,4 +31,9 @@ router.post('/clear', (_req, res) => {
   res.json({ message: 'Cleared' });
 });
 
+router.post('/checkout', (_req, res) => {
+  res.json({ message: 'Checkout complete (simulated).' });
+});
+
+
 export default router;
