@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
-    "cross-spawn": "^7.0.6",
+    "execa": "^9.6.0",
     "express": "^4.19.2",
     "helmet": "^7.1.0",
     "zod": "^3.23.8"
@@ -37,5 +37,15 @@
     "ts-jest": "^29.4.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.4"
+  },
+  "overrides": {
+    "execa": {
+      "cross-spawn": "7.0.6"
+    },
+    "jest-changed-files": {
+      "execa": {
+        "cross-spawn": "7.0.6"
+      }
+    }
   }
 }
