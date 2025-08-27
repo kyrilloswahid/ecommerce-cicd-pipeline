@@ -39,7 +39,7 @@ jobs:
     needs:
       - lint
       - test
-      - whitesource   # change to "sca" if you use OWASP DC instead
+      - whitesource
     if: ${{ github.event.pull_request.head.repo.full_name == github.repository }} # skip for forks (no secrets)
     steps:
       - uses: actions/checkout@v4

@@ -1,7 +1,8 @@
+import path from 'path';
+
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
-import path from 'path';
 
 import cartRouter from './routes/cart';
 import healthRouter from './routes/health';
