@@ -1,7 +1,9 @@
 .git
 node_modules
 dist
+tests
 coverage
 Dockerfile*
 .github
 .env
+*.log
