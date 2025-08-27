@@ -38,6 +38,9 @@
     "typescript": "^5.5.4"
   },
   "overrides": {
-    "cross-spawn": "7.0.5"
+    "cross-spawn": "7.0.5",
+    "cross": {
+      "spawn": "7.0.5"
+    }
   }
 }
