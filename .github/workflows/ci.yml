@@ -17,7 +17,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
+        with:
+          node-version: 20
+          cache: ''
       - run: npm ci
       - run: npm run lint -- --max-warnings=0
 
@@ -26,7 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
+        with:
+          node-version: 20
+          cache: ''
       - run: npm ci
       - run: npm test -- --ci --coverage
 
@@ -35,7 +39,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
-        with: { node-version: 20, cache: npm }
+        with:
+          node-version: 20
+          cache: ''
       - run: npm ci
       - run: npm audit --audit-level=moderate  
   
@@ -71,6 +77,8 @@ jobs:
           no-cache: true
           load: true
           tags: ${{ steps.meta.outputs.IMAGE }}:${{ steps.meta.outputs.SHA_TAG }}
+          cache-from: ''
+          cache-to: ''
 
       - name: Trivy scan
         uses: aquasecurity/trivy-action@master
