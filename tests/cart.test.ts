@@ -1,6 +1,6 @@
 import request from 'supertest';
-
 import app from '../src/app';
+import { describe, it, expect } from 'vitest';
 
 describe('Cart API', () => {
   it('adds items and returns cart', async () => {
@@ -15,3 +15,4 @@ describe('Cart API', () => {
     await request(app).post('/cart/add').send({ productId: '1', qty: 0 }).expect(400);
   });
 });
+

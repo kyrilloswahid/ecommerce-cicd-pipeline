@@ -1,6 +1,6 @@
 import request from 'supertest';
-
 import app from '../src/app';
+import { describe, it } from 'node:test';
 
 describe('Products API', () => {
   it('lists products', async () => {
@@ -18,3 +18,7 @@ describe('Products API', () => {
     await request(app).get('/products/999').expect(404);
   });
 });
+function expect(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+
