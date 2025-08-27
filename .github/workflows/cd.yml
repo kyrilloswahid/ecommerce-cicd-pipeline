@@ -77,3 +77,10 @@ jobs:
           docker build -t $IMAGE:${VERSION#v} -t $IMAGE:latest .
           docker push $IMAGE:${VERSION#v}
           docker push $IMAGE:latest
+
+      - name: Simulate Kubernetes deployment
+        run: |
+          echo "Simulating deployment to Kubernetes..."
+          echo "kubectl apply -f helm-chart/templates/deployment.yml"
+          # Uncomment the next line to actually deploy if kubectl is configured
+          # kubectl apply -f helm-chart/templates/deployment.yml
