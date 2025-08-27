@@ -1,26 +1,31 @@
-# Stage 1: Build
+# Stage 1
+
 FROM node:20-alpine AS build
-# set working dir
+
 WORKDIR /app
-# install dependencies
+
 COPY package*.json ./
 RUN npm ci
-# copy src code
+
 COPY . .
-# run for ts and js
 RUN npm run build
 
+# Stage 2
 
-# Stage 2: Run
 FROM node:20-alpine
 
+ENV NODE_ENV=production
 WORKDIR /app
-# only copy compiled js = package files
+
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 COPY --from=build /app/dist ./dist
-# expose to port
+COPY --from=build /app/public ./public
+
+RUN addgroup -S app && adduser -S app -G app
+USER app
+
 EXPOSE 3000
-# start the app
-CMD ["node", "dist/app.js"]
+
+CMD ["node", "dist/server.js"]
