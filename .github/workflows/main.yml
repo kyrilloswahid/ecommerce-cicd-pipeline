@@ -36,6 +36,7 @@ jobs:
   
   build_and_push:
     runs-on: ubuntu-latest
+    environment: docker_credentials
     needs:
       - lint
       - test
