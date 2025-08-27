@@ -93,12 +93,12 @@ jobs:
 
 
   deploy:
-      - name: Deploy to Minikube
-        run: |
-          helm upgrade --install eshop ./helm-chart \
-            --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/eshop \
-            --set image.tag=${{ needs.release.outputs.new-release-version }} \
-            --wait --timeout=300s
+    name: Deploy to Minikube
+    needs: [release, build_and_push]
+    if: needs.release.outputs.new-release-published == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Start minikube
@@ -112,11 +112,21 @@ jobs:
       - name: Deploy to Minikube with Helm
         run: |
           curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-          
           helm upgrade --install eshop ./helm-chart \
             --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/eshop \
             --set image.tag=${{ needs.release.outputs.new-release-version }} \
             --wait --timeout=300s
+
+      - name: Get application URL
+        id: get-url
+        run: |
+          kubectl wait --for=condition=available --timeout=300s deployment/eshop-eshop-microservice
+          MINIKUBE_IP=$(minikube ip)
+          NODE_PORT=$(kubectl get service eshop-eshop-microservice -o jsonpath='{.spec.ports[0].nodePort}')
+          APP_URL="http://${MINIKUBE_IP}:${NODE_PORT}"
+          echo "app-url=${APP_URL}" >> $GITHUB_OUTPUT
+          echo "Application deployed successfully!"
+          echo "Access your application at: ${APP_URL}"
 
       - name: Get application URL
         id: get-url
