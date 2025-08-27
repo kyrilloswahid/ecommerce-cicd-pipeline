@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -36,6 +36,7 @@ jobs:
   
   build_and_push:
     runs-on: ubuntu-latest
+
     needs:
       - lint
       - test
@@ -62,6 +63,7 @@ jobs:
         with:
           context: .
           push: false
+          no-cache: true
           load: true
           tags: ${{ steps.meta.outputs.IMAGE }}:${{ steps.meta.outputs.SHA_TAG }}
 
