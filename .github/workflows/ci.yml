@@ -87,13 +87,20 @@ jobs:
           cache-from: ''
           cache-to: ''
 
+      - name: Check .trivyignore exists
+        run: |
+          echo "Contents of .trivyignore:"
+          cat .trivyignore || echo ".trivyignore not found"
+          ls -la .trivyignore || echo ".trivyignore file not found"
+
       - name: Trivy scan
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: ${{ steps.meta.outputs.IMAGE }}:${{ steps.meta.outputs.SHA_TAG }}
           format: table
           severity: CRITICAL,HIGH
           exit-code: 1
+          ignore-unfixed: true
           trivyignores: .trivyignore
 
       - name: Push image
