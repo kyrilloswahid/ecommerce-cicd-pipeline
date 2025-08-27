@@ -5,6 +5,7 @@ on:
     branches: [main]
 
 env:
+  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
   NODE_VERSION: 20
 
 permissions:
@@ -30,16 +31,12 @@ jobs:
       - name: Run unit tests
         run: npm run test:ci
 
-      - name: Run end-to-end tests
-        run: npm test -- --ci --coverage
-
-  release:
-    name: Semantic Release
-    needs: test
+  semantic-release-and-docker:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    outputs:
-      new-release-published: ${{ steps.semantic.outputs.new-release-published }}
-      new-release-version: ${{ steps.semantic.outputs.new-release-version }}
+    needs: [test]
+    env:
+      IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,86 +53,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Semantic Release
-        id: semantic
+      - name: Run semantic-release and get version
+        id: release
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        run: npx semantic-release
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npx semantic-release
+          VERSION=$(git describe --tags --abbrev=0)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
 
-  build_and_push:
-    name: CD
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    on:
-      push:
-        branches: [main]
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    env:
-      IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
-
-    jobs:
-      test:
-        name: Run Tests
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-
-          - name: Setup Node.js
-            uses: actions/setup-node@v4
-            with:
-              node-version: '20'
-              cache: 'npm'
-
-          - name: Install dependencies
-            run: npm ci
-
-          - name: Run unit tests
-            run: npm run test:ci
-
-      semantic-release:
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        runs-on: ubuntu-latest
-        needs: [test]
-        env:
-          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
-        outputs:
-          version: ${{ steps.release.outputs.version }}
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0
-              token: ${{ secrets.GITHUB_TOKEN }}
-
-          - name: Set up Node.js
-            uses: actions/setup-node@v4
-            with:
-              node-version: '20'
-
-          - name: Install dependencies
-            run: npm ci
-
-          - name: Run semantic-release
-            id: release
-            run: |
-              npx semantic-release
-              VERSION=$(git describe --tags --abbrev=0)
-              echo "version=${VERSION}" >> $GITHUB_OUTPUT
-            env:
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-          - name: Set up Docker Buildx
-            uses: docker/setup-buildx-action@v3
-
-          - name: Log in to Docker Hub
-            uses: docker/login-action@v3
-            with:
-              username: ${{ secrets.DOCKERHUB_USERNAME }}
-              password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-          - name: Build and push Docker image with version tag
-            run: |
-              VERSION=$(git describe --tags --abbrev=0)
-              docker build -t $IMAGE:${VERSION#v} -t $IMAGE:latest .
-              docker push $IMAGE:${VERSION#v}
-              docker push $IMAGE:latest
+      - name: Build and push Docker image with version tag
+        run: |
+          VERSION=$(git describe --tags --abbrev=0)
+          docker build -t $IMAGE:${VERSION#v} -t $IMAGE:latest .
+          docker push $IMAGE:${VERSION#v}
+          docker push $IMAGE:latest
