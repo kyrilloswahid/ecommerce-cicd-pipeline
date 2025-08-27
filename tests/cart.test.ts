@@ -1,3 +1,7 @@
+// @ts-nocheck
+/**
+ * @jest-environment node
+ */
 import request from "supertest";
 import app from "../src/app";
 
