@@ -91,13 +91,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+
   deploy:
-    name: Deploy to Minikube
-    needs: [release, build_and_push]
-    if: needs.release.outputs.new-release-published == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
+      - name: Deploy to Minikube
+        run: |
+          helm upgrade --install eshop ./helm-chart \
+            --set image.repository=${{ secrets.DOCKERHUB_USERNAME }}/eshop \
+            --set image.tag=${{ needs.release.outputs.new-release-version }} \
+            --wait --timeout=300s
         uses: actions/checkout@v4
 
       - name: Start minikube

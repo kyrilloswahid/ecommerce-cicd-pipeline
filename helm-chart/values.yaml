@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: DOCKERHUB_USERNAME/eshop
-  tag: "latest"
+  tag: "latest" # This will be overridden by the workflow
   pullPolicy: IfNotPresent
 
 service:
