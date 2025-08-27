@@ -117,16 +117,6 @@ jobs:
             --set image.tag=${{ needs.release.outputs.new-release-version }} \
             --wait --timeout=300s
 
-      - name: Get application URL
-        id: get-url
-        run: |
-          kubectl wait --for=condition=available --timeout=300s deployment/eshop-eshop-microservice
-          MINIKUBE_IP=$(minikube ip)
-          NODE_PORT=$(kubectl get service eshop-eshop-microservice -o jsonpath='{.spec.ports[0].nodePort}')
-          APP_URL="http://${MINIKUBE_IP}:${NODE_PORT}"
-          echo "app-url=${APP_URL}" >> $GITHUB_OUTPUT
-          echo "Application deployed successfully!"
-          echo "Access your application at: ${APP_URL}"
 
       - name: Get application URL
         id: get-url
