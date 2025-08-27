@@ -1,0 +1,14 @@
+replicaCount: 1
+
+image:
+  repository: DOCKERHUB_USERNAME/eshop
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+containerPort: 3000
+
+resources: {}
