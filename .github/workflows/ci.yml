@@ -68,7 +68,6 @@ jobs:
         run: |
           echo "IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/eshop" >> $GITHUB_OUTPUT
           echo "SHA_TAG=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
-          echo "PR_TAG=pr-${{ github.event.number }}" >> $GITHUB_OUTPUT
 
       - name: Build image
         uses: docker/build-push-action@v6
@@ -95,8 +94,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: |
-            ${{ steps.meta.outputs.IMAGE }}:${{ steps.meta.outputs.SHA_TAG }}
-            ${{ steps.meta.outputs.IMAGE }}:${{ steps.meta.outputs.PR_TAG }}
+          tags: ${{ steps.meta.outputs.IMAGE }}:${{ steps.meta.outputs.SHA_TAG }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
