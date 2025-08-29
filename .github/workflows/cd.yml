@@ -1,11 +1,11 @@
-name: CD
+name: CD Pipeline
 
 on:
   push:
     branches: [main]
 
+
 env:
-  IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
   NODE_VERSION: 20
 
 permissions:
@@ -31,12 +31,12 @@ jobs:
       - name: Run unit tests
         run: npm run test:ci
 
-  semantic-release-and-docker:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  release:
+    name: Semantic Release
     runs-on: ubuntu-latest
-    needs: [test]
-    env:
-      IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
+    needs: test
+    outputs:
+      version: ${{ steps.get_version.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,14 +53,25 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run semantic-release and get version
-        id: release
+      - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Get latest version
+        id: get_version
         run: |
-          npx semantic-release
           VERSION=$(git describe --tags --abbrev=0)
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
+
+
+  docker:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: release
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -71,16 +82,43 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image with version tag
+      - name: Build and push Docker image with version and latest tags
+        env:
+          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
+          VERSION: ${{ needs.release.outputs.version }}
         run: |
-          VERSION=$(git describe --tags --abbrev=0)
-          docker build -t $IMAGE:${VERSION#v} -t $IMAGE:latest .
-          docker push $IMAGE:${VERSION#v}
-          docker push $IMAGE:latest
+          docker build -t $IMAGE:$VERSION -t $IMAGE:latest .
+          docker push $IMAGE:$VERSION
 
-      - name: Simulate Kubernetes deployment
+  deploy:
+    name: Deploy to Minikube using Helm
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+
+      - name: Set up Minikube
+        uses: medyagh/setup-minikube@v2
+
+      - name: Update Helm values with new image tag
+        env:
+          IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/eshop
+          VERSION: ${{ needs.release.outputs.version }}
         run: |
-          echo "Simulating deployment to Kubernetes..."
-          echo "kubectl apply -f helm-chart/templates/deployment.yml"
-          # Uncomment the next line to actually deploy if kubectl is configured
-          # kubectl apply -f helm-chart/templates/deployment.yml
+          sed -i "s|repository:.*|repository: $IMAGE|" helm-chart/values.yaml
+          sed -i "s|tag:.*|tag: \"$VERSION\"|" helm-chart/values.yaml
+
+      - name: Deploy with Helm
+        run: |
+          helm upgrade --install eshop ./helm-chart --namespace default --create-namespace
